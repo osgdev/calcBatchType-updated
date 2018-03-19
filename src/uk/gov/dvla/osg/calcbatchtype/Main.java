@@ -1,15 +1,9 @@
 package uk.gov.dvla.osg.calcbatchtype;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import uk.gov.dvla.osg.common.config.PresentationConfiguration;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
@@ -43,7 +37,7 @@ public class Main {
 			setArgs(args);
 			// Load files
 			LOGGER.trace("Load Config");
-			AppConfig appConfig = loadPropertiesFile();
+			AppConfig appConfig = new AppConfig(propsFile);
 	        LOGGER.trace("Load Customers");
 			DpfParser dpf = new DpfParser(inputFile, outputFile, appConfig);
 			ArrayList<DocumentProperties> docProps = dpf.Load();
@@ -71,11 +65,11 @@ public class Main {
 
 	}
 
-	private static AppConfig loadPropertiesFile() throws Exception{
+/*	private static AppConfig loadPropertiesFile() throws Exception{
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 		return mapper.readValue(new File(propsFile), AppConfig.class);
-	}
+	}*/
 
 	/**
 	 * Validate and set args

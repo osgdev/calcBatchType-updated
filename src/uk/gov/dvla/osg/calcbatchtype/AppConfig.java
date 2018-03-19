@@ -1,11 +1,14 @@
 package uk.gov.dvla.osg.calcbatchtype;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
+/*import java.io.File;*/
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+/*import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;*/
 
 class AppConfig {
 
@@ -40,11 +43,41 @@ class AppConfig {
 	private String postageFileSuffix;
 	private String presentationPriorityField;
 
-	public static AppConfig build (String fileName) throws Exception {
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-		mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
-		return mapper.readValue(new File(fileName), AppConfig.class);
+	public AppConfig(String fileName) throws Exception {
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream(fileName);
+		prop.load(input);
+		documentReference = prop.getProperty("documentReference");
+		ottField = prop.getProperty("ottField");
+		appNameField = prop.getProperty("appNameField");
+		fleetField = prop.getProperty("fleetField");
+		titleField = prop.getProperty("titleField");
+		name1Field = prop.getProperty("name1Field");
+		name2Field = prop.getProperty("name2Field");
+		address1Field = prop.getProperty("address1Field");
+		address2Field = prop.getProperty("address2Field");
+		address3Field = prop.getProperty("address3Field");
+		address4Field = prop.getProperty("address4Field");
+		address5Field = prop.getProperty("address5Field");
+		postcodeField = prop.getProperty("postcodeField");
+		mscField = prop.getProperty("mscField");
+		langField = prop.getProperty("langField");
+		lookupReferenceFieldName = prop.getProperty("lookupReferenceFieldName");
+		batchType = prop.getProperty("batchType");
+		groupIdField = prop.getProperty("groupIdField");
+		outputBatchType = prop.getProperty("outputBatchType");
+		eogField = prop.getProperty("eogField");
+		lookupFile = prop.getProperty("lookupFile");
+		presentationPriorityConfigPath = prop.getProperty("presentationPriorityConfigPath");
+		presentationPriorityFileSuffix = prop.getProperty("presentationPriorityFileSuffix");
+		postageConfigPath = prop.getProperty("postageConfigPath");
+		postageFileSuffix = prop.getProperty("postageFileSuffix");
+		presentationPriorityField = prop.getProperty("presentationPriorityField");
+		productionConfigPath = prop.getProperty("productionConfigPath");
+		productionConfigPath = prop.getProperty("productionConfigPath");
+		productionFileSuffix = prop.getProperty("productionFileSuffix");
 	}
+	
 	public String EogField() {
 		return this.eogField;
 	}
@@ -161,4 +194,7 @@ class AppConfig {
 	public String getPresentationPriorityFileSuffix() {
 		return this.presentationPriorityFileSuffix;
 	}
+	/*ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+	mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
+	return mapper.readValue(new File(fileName), AppConfig.class);*/
 }
