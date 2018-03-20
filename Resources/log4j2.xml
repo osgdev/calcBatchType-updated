@@ -6,12 +6,20 @@
        <Console name="console" target="SYSTEM_OUT">
          <PatternLayout pattern="%d{dd-MM-yy HH:mm:ss} [%-5level] %c{3} - %msg%ex{short}%n" />
        </Console>
+       <File name="MyFile">
+         <Append>false</Append>
+         <FileName>c:/logs/CalcBatchType.log</FileName>
+         <PatternLayout pattern="%d{dd-MM-yyyy HH:mm:ss} [%-5level] %c{3} - %msg%ex{short}%n" />
+       </File>
     </Appenders>
     
     <Loggers>
+		<Logger name="uk.gov.dvla.osg" level="all">
+			<AppenderRef ref="MyFile" level="all" />
+		</Logger>
         <Root level="all">
 			<AppenderRef ref="console" level="all"/>
-        </Root>
+		</Root>
     </Loggers>
     
 </Configuration>
