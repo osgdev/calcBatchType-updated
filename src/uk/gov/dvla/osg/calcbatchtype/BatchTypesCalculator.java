@@ -2,7 +2,6 @@ package uk.gov.dvla.osg.calcbatchtype;
 
 import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.dvla.osg.common.classes.BatchType.*;
-import static uk.gov.dvla.osg.common.classes.FullBatchType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import uk.gov.dvla.osg.common.classes.BatchType;
 import uk.gov.dvla.osg.common.classes.FullBatchType;
 import uk.gov.dvla.osg.common.config.PresentationConfiguration;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
@@ -23,9 +23,11 @@ public class BatchTypesCalculator {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
+	private static ProductionConfiguration prodConfig;
+	
 	public static void run(ArrayList<DocumentProperties> docProps) {
 		LOGGER.info("CalculateBatchTypes initiated");
-		ProductionConfiguration prodConfig = ProductionConfiguration.getInstance();
+		prodConfig = ProductionConfiguration.getInstance();
 		PresentationConfiguration presConfig = PresentationConfiguration.getInstance();
 		// Sets ensure that lists only contain unique customers
 		Set<DocumentProperties> uniqueCustomers = new HashSet<DocumentProperties>();
@@ -67,32 +69,28 @@ public class BatchTypesCalculator {
 		// Use sets above plus PC file to determine batch type for each record
 		docProps.forEach(dp -> {
 			if (dp.getBatchType() == null) {
-				if (isNotEmpty(dp.getFleetNo())
-						&& !prodConfig.getSite(FullBatchType.valueOf(FLEET + "" + dp.getLang())).equals("X")) {
+				if (isNotEmpty(dp.getFleetNo()) && isNotIgnore(FLEET, dp.getLang())) {
 					dp.setBatchType(FLEET);
 					dp.setGroupId(fleetMap.get(dp.getFleetNo() + dp.getLang()));
 				} else if (isEmpty(dp.getMsc())) {
 					dp.setBatchType(UNSORTED);
 					dp.setEog();
-				} else if (clericalCustomers.contains(dp)
-						&& !prodConfig.getSite(FullBatchType.valueOf(CLERICAL + "" + dp.getLang())).equals("X")) {
+				} else if (clericalCustomers.contains(dp) && isNotIgnore(CLERICAL, dp.getLang())) {
 					dp.setBatchType(CLERICAL);
 					dp.setGroupId(multiMap.get(dp));
-				} else if (multiCustomers.contains(dp)
-						&& containsNone(prodConfig.getSite(FullBatchType.valueOf(MULTI + "" + dp.getLang())), 'x', 'X')) {
+				} else if (multiCustomers.contains(dp) && isNotIgnore(MULTI, dp.getLang())) {
 					dp.setBatchType(MULTI);
 					dp.setGroupId(multiMap.get(dp));
-				} else if (multiCustomers.contains(dp)
-						&& prodConfig.getSite(FullBatchType.valueOf(MULTI + "" + dp.getLang())).equals("X")) {
+				} else if (multiCustomers.contains(dp) && isIgnore(MULTI, dp.getLang())) {
 					dp.setGroupId(multiMap.get(dp));
-					if (!prodConfig.getSite(SORTEDE).equals("X")) {
+					if (isNotIgnore(SORTED, dp.getLang())) {
 						dp.setBatchType(SORTED);
 						dp.setEog();
 					} else {
 						dp.setBatchType(UNSORTED);
 						dp.setEog();
 					}
-				} else if (!prodConfig.getSite(FullBatchType.valueOf(SORTED + "" + dp.getLang())).equals("X")) {
+				} else if (isNotIgnore(SORTED, dp.getLang())) {
 					dp.setBatchType(SORTED);
 					dp.setEog();
 				} else {
@@ -102,5 +100,16 @@ public class BatchTypesCalculator {
 			}
 			dp.setPresentationPriority(presConfig.lookupRunOrder(dp.getBatchType()));
 		});
+	}
+
+	private static boolean isIgnore(BatchType batchType, String lang) {
+		return !isNotIgnore(batchType, lang);
+	}
+
+	private static boolean isNotIgnore(BatchType batchType, String lang) {
+		if (batchType.equals(MULTI)) {
+			return containsNone(prodConfig.getSite(FullBatchType.valueOf(batchType.name() + lang)), 'x', 'X');
+		}
+		return !prodConfig.getSite(FullBatchType.valueOf(batchType.name() + lang)).equals("X");
 	}
 }

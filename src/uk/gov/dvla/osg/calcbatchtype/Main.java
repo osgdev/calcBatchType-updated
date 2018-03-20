@@ -19,17 +19,10 @@ public class Main {
 	private static String outputFile;
 	private static String propsFile;
 
-	public static long bytesToMegabytes(long bytes) {
-		return bytes / (1024L * 1024L);
-	}
 
 	public static void main(String[] args) {
 
 		LOGGER.debug("calcBatchType started");
-		// Get the Java runtime
-		Runtime runtime = Runtime.getRuntime();
-		// Calculate the start time
-		long start = System.nanoTime();
 
 		try {
 			// Process args
@@ -54,14 +47,6 @@ public class Main {
 			LOGGER.fatal(e);
 			System.exit(1);
 		}
-
-		double seconds = (System.nanoTime() - start) / 1000000000.0;
-		System.out.format("Univocity Parser : %f \n", Double.valueOf(seconds));
-		// Run the garbage collector
-		runtime.gc();
-		// Calculate the used memory
-		System.out
-				.println("Used memory is megabytes: " + bytesToMegabytes(runtime.totalMemory() - runtime.freeMemory()));
 
 	}
 
