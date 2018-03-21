@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import uk.gov.dvla.osg.common.classes.Selector;
 import uk.gov.dvla.osg.common.config.PresentationConfiguration;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 import uk.gov.dvla.osg.common.config.SelectorLookup;
@@ -74,11 +75,13 @@ public class Main {
 
 	private static void loadLookupFiles(AppConfig appConfig, ArrayList<DocumentProperties> docProps) {
 		// set Production Config using the Selector Lookup file
-		SelectorLookup lookup = new SelectorLookup(appConfig.LookupFile());
+		SelectorLookup.init(appConfig.LookupFile());
+		Selector selector = SelectorLookup.getInstance().getLookup().get(docProps.get(0).getSelectorRef());
 		ProductionConfiguration.init(appConfig.ProductionConfigPath()
-				+ lookup.get(docProps.get(0).getSelectorRef()).getProductionConfig() 
+				+ selector.getProductionConfig() 
 				+ appConfig.ProductionFileSuffix());
-		PresentationConfiguration.init(appConfig.getPresentationPriorityConfigPath() + lookup.get(docProps.get(0).getSelectorRef()).getPresentationConfig()
+		PresentationConfiguration.init(appConfig.getPresentationPriorityConfigPath() 
+				+ selector.getPresentationConfig()
 				+ appConfig.getPresentationPriorityFileSuffix());
 	}
 }

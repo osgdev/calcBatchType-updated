@@ -22,12 +22,9 @@ import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 public class BatchTypesCalculator {
 
 	private static final Logger LOGGER = LogManager.getLogger();
-
-	private static ProductionConfiguration prodConfig;
 	
 	public static void run(ArrayList<DocumentProperties> docProps) {
 		LOGGER.info("CalculateBatchTypes initiated");
-		prodConfig = ProductionConfiguration.getInstance();
 		PresentationConfiguration presConfig = PresentationConfiguration.getInstance();
 		// Sets ensure that lists only contain unique customers
 		Set<DocumentProperties> uniqueCustomers = new HashSet<DocumentProperties>();
@@ -39,7 +36,7 @@ public class BatchTypesCalculator {
 
 		// Group Fleets together & determine if non-fleets are unique or multis
 		docProps.forEach(docProp -> {
-			if (isEmpty(docProp.getFleetNo())) {
+			if (isBlank(docProp.getFleetNo())) {
 				if (!(uniqueCustomers.add(docProp))) {
 					multiCustomers.add(docProp);
 				}
@@ -54,12 +51,12 @@ public class BatchTypesCalculator {
 		uniqueFleets.forEach(fleet -> fleetMap.put(fleet, i.getAndIncrement()));
 
 		// Batch Type changed to clerical when over the maxMulti limit
-		int maxMulti = prodConfig.getMaxMulti();
+		int maxMulti = ProductionConfiguration.getInstance().getMaxMulti();
+		
 		multiCustomers.forEach(docProp -> {
-			if (!prodConfig.getSite(FullBatchType.valueOf(CLERICAL+""+docProp.getLang())).equals("X")) {
+			if (isNotIgnore(CLERICAL, docProp.getLang())) {
 				int occurrences = Collections.frequency(docProps, docProp);
 				if (occurrences > maxMulti) {
-					LOGGER.debug("{} {}", docProp.getName1(), occurrences);
 					//Change batch type to CLERICAL
 					clericalCustomers.add(docProp);
 				}
@@ -108,8 +105,8 @@ public class BatchTypesCalculator {
 
 	private static boolean isNotIgnore(BatchType batchType, String lang) {
 		if (batchType.equals(MULTI)) {
-			return containsNone(prodConfig.getSite(FullBatchType.valueOf(batchType.name() + lang)), 'x', 'X');
+			return containsNone(ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf(batchType.name() + lang)), 'x', 'X');
 		}
-		return !prodConfig.getSite(FullBatchType.valueOf(batchType.name() + lang)).equals("X");
+		return !ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf(batchType.name() + lang)).equals("X");
 	}
 }
