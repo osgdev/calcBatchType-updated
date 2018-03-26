@@ -20,10 +20,10 @@ public class Main {
 	private static String outputFile;
 	private static String propsFile;
 
-
+ 
 	public static void main(String[] args) {
 
-		LOGGER.debug("calcBatchType started");
+		LOGGER.trace("calcBatchType started");
 
 		try {
 			// Process args
@@ -38,7 +38,7 @@ public class Main {
 			LOGGER.trace("Load Lookup file");
 			loadLookupFiles(appConfig, docProps);
 			// set batch types
-			LOGGER.trace("Run BTC");
+			LOGGER.trace("Run Batch Type Calculator");
 			BatchTypesCalculator.run(docProps);
 			// save to new file
 			LOGGER.trace("Save DPF");
@@ -48,17 +48,10 @@ public class Main {
 			LOGGER.fatal(e);
 			System.exit(1);
 		}
-
 	}
 
-/*	private static AppConfig loadPropertiesFile() throws Exception{
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-		return mapper.readValue(new File(propsFile), AppConfig.class);
-	}*/
-
 	/**
-	 * Validate and set args
+	 * Validate number of expected arguements and set args
 	 * @param args
 	 */
 	private static void setArgs(String[] args) {
@@ -73,8 +66,13 @@ public class Main {
 
 	}
 
+	/**
+	 * Loads selector, Production Configuration and Presentation Configuration files.
+	 * @param appConfig Application Configuration file
+	 * @param docProps Document Properties file
+	 */
 	private static void loadLookupFiles(AppConfig appConfig, ArrayList<DocumentProperties> docProps) {
-		// set Production Config using the Selector Lookup file
+		// Lookup config files based on the selector, format is path+fileName+suffix
 		SelectorLookup.init(appConfig.LookupFile());
 		Selector selector = SelectorLookup.getInstance().getLookup().get(docProps.get(0).getSelectorRef());
 		ProductionConfiguration.init(appConfig.ProductionConfigPath()
@@ -84,4 +82,10 @@ public class Main {
 				+ selector.getPresentationConfig()
 				+ appConfig.getPresentationPriorityFileSuffix());
 	}
+	
+	/*	private static AppConfig loadPropertiesFile() throws Exception{
+	ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+	mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+	return mapper.readValue(new File(propsFile), AppConfig.class);
+	}*/
 }

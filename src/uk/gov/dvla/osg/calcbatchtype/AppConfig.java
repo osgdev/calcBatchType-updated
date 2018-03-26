@@ -3,13 +3,13 @@ package uk.gov.dvla.osg.calcbatchtype;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
-/*import java.io.File;*/
 
-/*import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;*/
 
+/**
+ * Holds names of the document properties fields and
+ * path information for configuration files.
+ *
+ */
 class AppConfig {
 
 	private String documentReference;
@@ -33,6 +33,7 @@ class AppConfig {
 	private String groupIdField;
 	private String outputBatchType;
 	private String eogField;
+	private String presentationPriorityField;
 	// FILES
 	private String lookupFile;
 	private String presentationPriorityConfigPath;
@@ -41,7 +42,6 @@ class AppConfig {
 	private String productionFileSuffix;
 	private String postageConfigPath;
 	private String postageFileSuffix;
-	private String presentationPriorityField;
 
 	public AppConfig(String fileName) throws Exception {
 		Properties prop = new Properties();

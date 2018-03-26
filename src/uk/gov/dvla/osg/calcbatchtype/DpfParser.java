@@ -29,6 +29,10 @@ public class DpfParser {
 		this.appConfig = appConfig;
 	}
 
+	/**
+	 * Extracts records from the .dpf file.
+	 * @return a list of DocProps
+	 */
 	public ArrayList<DocumentProperties> Load() {
 		ArrayList<DocumentProperties> docProps = new ArrayList<>();
 		TsvParser parser = createParser();

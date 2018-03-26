@@ -19,6 +19,10 @@ import uk.gov.dvla.osg.common.classes.FullBatchType;
 import uk.gov.dvla.osg.common.config.PresentationConfiguration;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 
+/**
+ * Calculates the batch type for each record, if not already set.
+ * Current batch types are CLERICAL, FLEET, MULTI, SORTED & SORTED.
+ */
 public class BatchTypesCalculator {
 
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -75,10 +79,10 @@ public class BatchTypesCalculator {
 				} else if (clericalCustomers.contains(dp) && isNotIgnore(CLERICAL, dp.getLang())) {
 					dp.setBatchType(CLERICAL);
 					dp.setGroupId(multiMap.get(dp));
-				} else if (multiCustomers.contains(dp) && isNotIgnore(MULTI, dp.getLang())) {
+				} else if (multiCustomers.contains(dp) && isAllowMulti(dp.getLang())) {
 					dp.setBatchType(MULTI);
 					dp.setGroupId(multiMap.get(dp));
-				} else if (multiCustomers.contains(dp) && isIgnore(MULTI, dp.getLang())) {
+				} else if (multiCustomers.contains(dp) && isGroup(MULTI, dp.getLang())) {
 					dp.setGroupId(multiMap.get(dp));
 					if (isNotIgnore(SORTED, dp.getLang())) {
 						dp.setBatchType(SORTED);
@@ -99,14 +103,38 @@ public class BatchTypesCalculator {
 		});
 	}
 
-	private static boolean isIgnore(BatchType batchType, String lang) {
-		return !isNotIgnore(batchType, lang);
+	
+	/**
+	 * If site is set to X then AllowMulti is false but isGroup is true. Records are processed as 
+	 * singles with groupId set. 
+	 * @param multi
+	 * @param lang
+	 * @return
+	 */
+	private static boolean isGroup(BatchType multi, String lang) {
+		return !isNotIgnore(multi, lang);
 	}
 
+
+	/**
+	 * Checks the site property in the production configuration file to see 
+	 * if the batch type should be ignored.
+	 * @param batchType
+	 * @param lang
+	 * @return true if site is not set as 'X' in config file
+	 */
 	private static boolean isNotIgnore(BatchType batchType, String lang) {
-		if (batchType.equals(MULTI)) {
-			return containsNone(ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf(batchType.name() + lang)), 'x', 'X');
-		}
 		return !ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf(batchType.name() + lang)).equals("X");
+	}
+	
+	/**
+	 * Checks the site property in the production configuration file to see if Multis are to be processed.
+	 * @param batchType
+	 * @param lang
+	 * @return true if site is not 'X' or 'XX' in config file
+	 */
+	private static boolean isAllowMulti(String lang) {
+		String site = ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf("MULTI" + lang));
+			return !(site.equals("XX") || site.equals("X"));
 	}
 }

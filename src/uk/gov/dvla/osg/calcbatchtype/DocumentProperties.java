@@ -4,6 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import uk.gov.dvla.osg.common.classes.BatchType;
 
+/**
+ * Subset of the Doc Props (.dpf) file.
+ */
 public class DocumentProperties {
 
 	private String selectorRef, docRef, ott, fleetNo, title, name1, name2, add1, add2, add3, add4, add5, pc, msc, dps,
