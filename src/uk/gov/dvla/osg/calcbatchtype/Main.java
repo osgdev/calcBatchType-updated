@@ -74,7 +74,7 @@ public class Main {
 	private static void loadLookupFiles(AppConfig appConfig, ArrayList<DocumentProperties> docProps) {
 		// Lookup config files based on the selector, format is path+fileName+suffix
 		SelectorLookup.init(appConfig.LookupFile());
-		Selector selector = SelectorLookup.getInstance().getLookup().get(docProps.get(0).getSelectorRef());
+		Selector selector = SelectorLookup.getInstance().get(docProps.get(0).getSelectorRef());
 		ProductionConfiguration.init(appConfig.ProductionConfigPath()
 				+ selector.getProductionConfig() 
 				+ appConfig.ProductionFileSuffix());
