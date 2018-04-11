@@ -98,6 +98,9 @@ public class BatchTypesCalculator {
 					dp.setBatchType(UNSORTED);
 					dp.setEog();
 				}
+			} else {
+				// Single so set EOG
+				dp.setEog();
 			}
 			dp.setPresentationPriority(presConfig.lookupRunOrder(dp.getBatchType()));
 		});
