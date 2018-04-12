@@ -21,7 +21,7 @@ import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 
 /**
  * Calculates the batch type for each record, if not already set.
- * Current batch types are CLERICAL, FLEET, MULTI, SORTED & SORTED.
+ * Current batch types are CLERICAL, FLEET, MULTI, SORTED & UNSORTED.
  */
 public class BatchTypesCalculator {
 

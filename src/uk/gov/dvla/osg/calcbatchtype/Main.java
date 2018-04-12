@@ -2,6 +2,7 @@ package uk.gov.dvla.osg.calcbatchtype;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,8 +45,8 @@ public class Main {
 			LOGGER.trace("Save DPF");
 			dpf.Save(docProps);
 			LOGGER.trace("Data saved to: {}", outputFile);
-		} catch (Exception e) {
-			LOGGER.fatal(e);
+		} catch (Exception ex) {
+			LOGGER.fatal(ExceptionUtils.getStackTrace(ex));
 			System.exit(1);
 		}
 	}
