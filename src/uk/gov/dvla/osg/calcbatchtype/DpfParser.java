@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.univocity.parsers.common.processor.ConcurrentRowProcessor;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.tsv.TsvParser;
@@ -14,7 +17,7 @@ import com.univocity.parsers.tsv.TsvWriter;
 import com.univocity.parsers.tsv.TsvWriterSettings;
 
 public class DpfParser {
-
+	private static final Logger LOGGER = LogManager.getLogger();
 	private String[] headers;
 	private String inputFile;
 	private String outputFile;
@@ -55,7 +58,7 @@ public class DpfParser {
 					record.getString(appConfig.PcField()), 
 					record.getString(appConfig.MscField()),
 					record.getString(appConfig.LangField()));
-
+					LOGGER.debug("BT {}", record.getString(appConfig.BatchType()));
 					dp.setBatchType(record.getString(appConfig.BatchType()));
 
 			docProps.add(dp);
@@ -68,7 +71,7 @@ public class DpfParser {
 	 * @param outputFile path of the file to write out to
 	 * @throws IOException unable to write output file to the supplied path
 	 */
-	public void Save(ArrayList<DocumentProperties> docProps) throws IOException {
+	public void Save(ArrayList<DocumentProperties> docProps) {
 		try (FileWriter fw = new FileWriter(new File(outputFile))) {
 			// Create an instance of TsvWriter with the default settings
 			TsvWriter writer = new TsvWriter(fw, new TsvWriterSettings());
@@ -91,6 +94,10 @@ public class DpfParser {
 			});	
 			// Flushes and closes the writer
 			writer.close();
+			// Added catch block - PB 13/04
+		} catch (IOException ex) {
+			LOGGER.fatal("Unable to write to {} : {}", outputFile, ex.getMessage());
+			System.exit(1);
 		}
 	}
 	
