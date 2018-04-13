@@ -58,7 +58,6 @@ public class DpfParser {
 					record.getString(appConfig.PcField()), 
 					record.getString(appConfig.MscField()),
 					record.getString(appConfig.LangField()));
-					LOGGER.debug("BT {}", record.getString(appConfig.BatchType()));
 					dp.setBatchType(record.getString(appConfig.BatchType()));
 
 			docProps.add(dp);
