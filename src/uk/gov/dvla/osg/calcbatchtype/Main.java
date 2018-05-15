@@ -1,6 +1,8 @@
 package uk.gov.dvla.osg.calcbatchtype;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -41,6 +43,8 @@ public class Main {
 			// set batch types
 			LOGGER.trace("Run Batch Type Calculator");
 			BatchTypesCalculator.run(docProps);
+			LOGGER.trace("Printing Summary");
+			summaryPrint(docProps);
 			// save to new file
 			LOGGER.trace("Save DPF");
 			dpf.Save(docProps);
@@ -51,7 +55,7 @@ public class Main {
 		}
 	}
 
-	/**
+    /**
 	 * Validate number of expected arguements and set args
 	 * @param args
 	 */
@@ -84,6 +88,17 @@ public class Main {
 				+ appConfig.getPresentationPriorityFileSuffix());
 	}
 	
+	/**
+	* Prints a summary of the number of items for each batch type.
+    * @param docProps
+    */
+	private static void summaryPrint(ArrayList<DocumentProperties> docProps) {
+        Map<String, Long> counting = docProps.stream().collect(
+                Collectors.groupingBy(DocumentProperties::getFullBatchType, Collectors.counting()));
+
+        LOGGER.debug(counting);
+        
+    }
 	/*	private static AppConfig loadPropertiesFile() throws Exception{
 	ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 	mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);

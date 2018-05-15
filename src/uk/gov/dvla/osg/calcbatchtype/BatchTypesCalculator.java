@@ -4,7 +4,6 @@ import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.dvla.osg.common.classes.BatchType.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,7 +20,7 @@ import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 
 /**
  * Calculates the batch type for each record, if not already set.
- * Current batch types are CLERICAL, FLEET, MULTI, SORTED & UNSORTED.
+ * Current batch types are CLERICAL, FLEET, MULTI, SORTED, UNSORTED & UNSORTED
  */
 public class BatchTypesCalculator {
 
@@ -32,41 +31,40 @@ public class BatchTypesCalculator {
 		PresentationConfiguration presConfig = PresentationConfiguration.getInstance();
 		// Sets ensure that lists only contain unique customers
 		Set<DocumentProperties> uniqueCustomers = new HashSet<DocumentProperties>();
-		Set<DocumentProperties> multiCustomers = new HashSet<DocumentProperties>();
+		
+		//Set<DocumentProperties> multiCustomers = new HashSet<DocumentProperties>();
+		Map<DocumentProperties, Integer> multiCustomers = new HashMap<>();
+		
 		Set<DocumentProperties> clericalCustomers = new HashSet<DocumentProperties>();
 		Map<DocumentProperties, Integer> multiMap = new HashMap<DocumentProperties, Integer>();
 		Map<String, Integer> fleetMap = new HashMap<String, Integer>();
 		Set<String> uniqueFleets = new HashSet<String>();
-
-		// Group Fleets together & determine if non-fleets are unique or multis
-		docProps.forEach(docProp -> {
-			if (isBlank(docProp.getFleetNo())) {
-				if (!(uniqueCustomers.add(docProp))) {
-					multiCustomers.add(docProp);
-				}
-			} else {
-				uniqueFleets.add(docProp.getFleetNo() + docProp.getLang());
-			}
-		});
+        // Batch Type changed to clerical when over the maxMulti limit
+        int maxMulti = ProductionConfiguration.getInstance().getMaxMulti();
+		
+        // Group Fleets together & determine if non-fleets are unique or multis
+		for (DocumentProperties docProp : docProps) {
+	          if (isBlank(docProp.getFleetNo())) {
+	                if (!(uniqueCustomers.add(docProp))) {
+	                    if (!multiCustomers.containsKey(docProp)) {
+	                        multiCustomers.put(docProp, 2); // MultiCustomer + Unique Customer    
+	                    } else if (multiCustomers.get(docProp) < maxMulti) {
+	                        multiCustomers.put(docProp, multiCustomers.get(docProp) + 1);
+	                    } else {
+	                        // Max Multi level hit so change batch type to CLERICAL
+	                        clericalCustomers.add(docProp);
+	                    }
+	                }
+	            } else {
+	                uniqueFleets.add(docProp.getFleetNo() + docProp.getLang());
+	            }
+		}
 
 		// Counter is used to set the group ID for multis and fleets
 		AtomicInteger i = new AtomicInteger(1);
-		multiCustomers.forEach(prop -> multiMap.put(prop, i.getAndIncrement()));
+		multiCustomers.forEach((k,v) -> multiMap.put(k, i.getAndIncrement()));
 		uniqueFleets.forEach(fleet -> fleetMap.put(fleet, i.getAndIncrement()));
-
-		// Batch Type changed to clerical when over the maxMulti limit
-		int maxMulti = ProductionConfiguration.getInstance().getMaxMulti();
 		
-		multiCustomers.forEach(docProp -> {
-			if (isNotIgnore(CLERICAL, docProp.getLang())) {
-				int occurrences = Collections.frequency(docProps, docProp);
-				if (occurrences > maxMulti) {
-					//Change batch type to CLERICAL
-					clericalCustomers.add(docProp);
-				}
-			}
-		});
-
 		// Use sets above plus PC file to determine batch type for each record
 		docProps.forEach(dp -> {
 			if (dp.getBatchType() == null) {
@@ -79,10 +77,10 @@ public class BatchTypesCalculator {
 				} else if (clericalCustomers.contains(dp) && isNotIgnore(CLERICAL, dp.getLang())) {
 					dp.setBatchType(CLERICAL);
 					dp.setGroupId(multiMap.get(dp));
-				} else if (multiCustomers.contains(dp) && isAllowMulti(dp.getLang())) {
+				} else if (multiCustomers.containsKey(dp) && isAllowMulti(dp.getLang())) {
 					dp.setBatchType(MULTI);
 					dp.setGroupId(multiMap.get(dp));
-				} else if (multiCustomers.contains(dp) && isGroup(MULTI, dp.getLang())) {
+				} else if (multiCustomers.containsKey(dp) && isGroup(MULTI, dp.getLang())) {
 					dp.setGroupId(multiMap.get(dp));
 					if (isNotIgnore(SORTED, dp.getLang())) {
 						dp.setBatchType(SORTED);
