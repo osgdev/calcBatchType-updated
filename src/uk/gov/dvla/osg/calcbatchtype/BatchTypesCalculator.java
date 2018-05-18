@@ -31,10 +31,7 @@ public class BatchTypesCalculator {
 		PresentationConfiguration presConfig = PresentationConfiguration.getInstance();
 		// Sets ensure that lists only contain unique customers
 		Set<DocumentProperties> uniqueCustomers = new HashSet<DocumentProperties>();
-		
-		//Set<DocumentProperties> multiCustomers = new HashSet<DocumentProperties>();
 		Map<DocumentProperties, Integer> multiCustomers = new HashMap<>();
-		
 		Set<DocumentProperties> clericalCustomers = new HashSet<DocumentProperties>();
 		Map<DocumentProperties, Integer> multiMap = new HashMap<DocumentProperties, Integer>();
 		Map<String, Integer> fleetMap = new HashMap<String, Integer>();
