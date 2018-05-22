@@ -24,7 +24,8 @@ import uk.gov.dvla.osg.common.config.ProductionConfiguration;
  */
 public class BatchTypesCalculator {
 
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final int MIN_CUSTOMERS_FOR_MULTI = 2; // MultiCustomer + Unique Customer
+    private static final Logger LOGGER = LogManager.getLogger();
 	
 	public static void run(ArrayList<DocumentProperties> docProps) {
 		LOGGER.info("CalculateBatchTypes initiated");
@@ -44,7 +45,7 @@ public class BatchTypesCalculator {
 	          if (isBlank(docProp.getFleetNo())) {
 	                if (!(uniqueCustomers.add(docProp))) {
 	                    if (!multiCustomers.containsKey(docProp)) {
-	                        multiCustomers.put(docProp, 2); // MultiCustomer + Unique Customer    
+	                        multiCustomers.put(docProp, MIN_CUSTOMERS_FOR_MULTI);  
 	                    } else if (multiCustomers.get(docProp) < maxMulti) {
 	                        multiCustomers.put(docProp, multiCustomers.get(docProp) + 1);
 	                    } else {
