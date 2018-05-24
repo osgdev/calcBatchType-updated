@@ -44,11 +44,11 @@ public class Main {
 			LOGGER.trace("Run Batch Type Calculator");
 			BatchTypesCalculator.run(docProps);
 			LOGGER.trace("Printing Summary");
-			summaryPrint(docProps);
 			// save to new file
 			LOGGER.trace("Save DPF");
 			dpf.Save(docProps);
 			LOGGER.trace("Data saved to: {}", outputFile);
+			summaryPrint(docProps);
 		} catch (Exception ex) {
 			LOGGER.fatal(ExceptionUtils.getStackTrace(ex));
 			System.exit(1);
