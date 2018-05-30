@@ -1,5 +1,6 @@
 package uk.gov.dvla.osg.calcbatchtype;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class Main {
  
 	public static void main(String[] args) {
 
-		LOGGER.trace("calcBatchType started");
+		LOGGER.trace("--- calcBatchType Started ---");
 
 		try {
 			// Process args
@@ -53,6 +54,8 @@ public class Main {
 			LOGGER.fatal(ExceptionUtils.getStackTrace(ex));
 			System.exit(1);
 		}
+		
+		LOGGER.trace("--- calcBatchType Finished ---");
 	}
 
     /**
@@ -63,12 +66,28 @@ public class Main {
 
 		if (args.length != EXPECTED_NUMBER_OF_ARGS) {
 			LOGGER.fatal("Incorrect number of args parsed {} expected {}", args.length, EXPECTED_NUMBER_OF_ARGS);
+            LOGGER.fatal(
+                    "Incorrect number of args parsed '{}' expecting '{}'. "
+                    + "Args are "
+                    + "1. Input file, "
+                    + "2. Output file, "
+                    + "3. Props file.",
+                    args.length, EXPECTED_NUMBER_OF_ARGS);
 			System.exit(1);
 		}
-		inputFile = args[0];
-		outputFile = args[1];
-		propsFile = args[2];
 
+        inputFile = args[0];
+        if (!(new File(inputFile).exists())) {
+            LOGGER.fatal("Input File '{}' doesn't exist", inputFile);
+            System.exit(1);
+        }
+		outputFile = args[1];
+		//TODO: Validate output file can be written
+        propsFile = args[2];
+        if (!(new File(propsFile).exists())) {
+            LOGGER.fatal("Properties File '{}' doesn't exist", propsFile);
+            System.exit(1);
+        }
 	}
 
 	/**
