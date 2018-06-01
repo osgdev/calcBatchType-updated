@@ -88,6 +88,8 @@ public class Main {
             LOGGER.fatal("Properties File '{}' doesn't exist", propsFile);
             System.exit(1);
         }
+        
+        //LOGGER.trace("ARGS: {} {} {}", inputFile, outputFile);
 	}
 
 	/**
