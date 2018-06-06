@@ -65,7 +65,6 @@ public class Main {
 	private static void setArgs(String[] args) {
 
 		if (args.length != EXPECTED_NUMBER_OF_ARGS) {
-			LOGGER.fatal("Incorrect number of args parsed {} expected {}", args.length, EXPECTED_NUMBER_OF_ARGS);
             LOGGER.fatal(
                     "Incorrect number of args parsed '{}' expecting '{}'. "
                     + "Args are "
@@ -77,19 +76,26 @@ public class Main {
 		}
 
         inputFile = args[0];
-        if (!(new File(inputFile).exists())) {
+        boolean inputFileExists = new File(inputFile).exists();
+        if (!inputFileExists) {
             LOGGER.fatal("Input File '{}' doesn't exist", inputFile);
             System.exit(1);
         }
+        
 		outputFile = args[1];
-		//TODO: Validate output file can be written
+/*		boolean writable = new File(outputFile).canWrite();
+		if (!writable) {
+		    LOGGER.fatal("Unable to write output file [{}] to disk.", outputFile);
+            System.exit(1);
+		}*/
+		
         propsFile = args[2];
-        if (!(new File(propsFile).exists())) {
+        boolean propsFileExists = new File(propsFile).exists();
+        if (!propsFileExists) {
             LOGGER.fatal("Properties File '{}' doesn't exist", propsFile);
             System.exit(1);
         }
         
-        //LOGGER.trace("ARGS: {} {} {}", inputFile, outputFile);
 	}
 
 	/**
@@ -100,10 +106,20 @@ public class Main {
 	private static void loadLookupFiles(AppConfig appConfig, ArrayList<DocumentProperties> docProps) {
 		// Lookup config files based on the selector, format is path+fileName+suffix
 		SelectorLookup.init(appConfig.LookupFile());
-		Selector selector = SelectorLookup.getInstance().get(docProps.get(0).getSelectorRef());
+		String selRef = docProps.get(0).getSelectorRef();
+		Selector selector = null;
+		
+		if (SelectorLookup.getInstance().isPresent(selRef)) {
+		    selector = SelectorLookup.getInstance().getSelector(selRef);
+		} else {
+		    LOGGER.fatal("Selector [{}] is not present in the lookupFile.", selRef);
+            System.exit(1);
+		}
+		
 		ProductionConfiguration.init(appConfig.ProductionConfigPath()
 				+ selector.getProductionConfig() 
 				+ appConfig.ProductionFileSuffix());
+		
 		PresentationConfiguration.init(appConfig.getPresentationPriorityConfigPath() 
 				+ selector.getPresentationConfig()
 				+ appConfig.getPresentationPriorityFileSuffix());
@@ -120,9 +136,4 @@ public class Main {
         LOGGER.debug(counting);
         
     }
-	/*	private static AppConfig loadPropertiesFile() throws Exception{
-	ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-	mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-	return mapper.readValue(new File(propsFile), AppConfig.class);
-	}*/
 }
