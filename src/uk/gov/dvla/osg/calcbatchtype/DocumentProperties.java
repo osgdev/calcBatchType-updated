@@ -2,7 +2,7 @@ package uk.gov.dvla.osg.calcbatchtype;
 
 import org.apache.commons.lang3.StringUtils;
 
-import uk.gov.dvla.osg.common.classes.BatchType;
+import uk.gov.dvla.osg.common.enums.BatchType;
 
 /**
  * Subset of the Doc Props (.dpf) file.

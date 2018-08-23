@@ -1,22 +1,18 @@
 package uk.gov.dvla.osg.calcbatchtype;
 
 import static org.apache.commons.lang3.StringUtils.*;
-import static uk.gov.dvla.osg.common.classes.BatchType.*;
+import static uk.gov.dvla.osg.common.enums.BatchType.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uk.gov.dvla.osg.common.classes.BatchType;
-import uk.gov.dvla.osg.common.classes.FullBatchType;
 import uk.gov.dvla.osg.common.config.PresentationConfiguration;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
+import uk.gov.dvla.osg.common.enums.BatchType;
+import uk.gov.dvla.osg.common.enums.FullBatchType;
 
 /**
  * Calculates the batch type for each record, if not already set.
