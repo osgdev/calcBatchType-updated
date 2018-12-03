@@ -39,6 +39,7 @@ public class Main {
 	        LOGGER.trace("Load Customers");
 			DpfParser dpf = new DpfParser(inputFile, outputFile, appConfig);
 			ArrayList<DocumentProperties> docProps = dpf.Load();
+						
 			LOGGER.trace("Load Lookup file");
 			loadLookupFiles(appConfig, docProps);
 			// set batch types
