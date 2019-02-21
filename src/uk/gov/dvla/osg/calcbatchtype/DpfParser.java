@@ -63,7 +63,7 @@ public class DpfParser {
 		});
 		headers = parser.getRecordMetadata().headers();
 		
-		Utils.archiveDpf(outputFile, "Original.bak", LOGGER);
+		Utils.archiveDpf(inputFile, "Original.bak", LOGGER);
 		
 		return docProps;
 	}
