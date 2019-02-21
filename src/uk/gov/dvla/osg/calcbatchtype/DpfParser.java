@@ -11,10 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.univocity.parsers.common.processor.ConcurrentRowProcessor;
 import com.univocity.parsers.common.processor.RowListProcessor;
-import com.univocity.parsers.tsv.TsvParser;
-import com.univocity.parsers.tsv.TsvParserSettings;
-import com.univocity.parsers.tsv.TsvWriter;
-import com.univocity.parsers.tsv.TsvWriterSettings;
+import com.univocity.parsers.tsv.*;
+
+import uk.gov.dvla.osg.common.classes.Utils;
 
 public class DpfParser {
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -63,6 +62,9 @@ public class DpfParser {
 			docProps.add(dp);
 		});
 		headers = parser.getRecordMetadata().headers();
+		
+		Utils.archiveDpf(outputFile, "Original.bak", LOGGER);
+		
 		return docProps;
 	}
 	/**
@@ -93,7 +95,7 @@ public class DpfParser {
 			});	
 			// Flushes and closes the writer
 			writer.close();
-			// Added catch block - PB 13/04
+			Utils.archiveDpf(outputFile, "CalcBatchType.bak", LOGGER);
 		} catch (IOException ex) {
 			LOGGER.fatal("Unable to write to {} : {}", outputFile, ex.getMessage());
 			System.exit(1);
@@ -112,4 +114,5 @@ public class DpfParser {
 		parserSettings.setHeaderExtractionEnabled(true);
 		return new TsvParser(parserSettings);
 	}
+	
 }
