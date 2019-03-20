@@ -13,7 +13,7 @@ import com.univocity.parsers.common.processor.ConcurrentRowProcessor;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.tsv.*;
 
-import uk.gov.dvla.osg.common.classes.Utils;
+import uk.gov.dvla.osg.common.utils.Utils;
 
 public class DpfParser {
 	private static final Logger LOGGER = LogManager.getLogger();
