@@ -26,7 +26,7 @@ public class Main {
 
  
 	public static void main(String[] args) {
-
+//
 		LOGGER.trace("--- calcBatchType Started ---");
 
 		try {
