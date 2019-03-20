@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uk.gov.dvla.osg.common.config.PresentationConfiguration;
+import uk.gov.dvla.osg.common.config.PresentationPriorityLookup;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 import uk.gov.dvla.osg.common.enums.BatchType;
 import uk.gov.dvla.osg.common.enums.FullBatchType;
@@ -22,10 +22,16 @@ public class BatchTypesCalculator {
 
 	private static final int MIN_CUSTOMERS_FOR_MULTI = 2; // MultiCustomer + Unique Customer
     private static final Logger LOGGER = LogManager.getLogger();
+    private final PresentationPriorityLookup presConfig;
+    private final ProductionConfiguration prodConfig;
 	
-	public static void run(ArrayList<DocumentProperties> docProps) {
+    public BatchTypesCalculator(ProductionConfiguration prodConfig, PresentationPriorityLookup presConfig) {
+        this.prodConfig = prodConfig;
+        this.presConfig = presConfig;
+    }
+    
+	public void run(ArrayList<DocumentProperties> docProps) {
 		LOGGER.info("CalculateBatchTypes initiated");
-		PresentationConfiguration presConfig = PresentationConfiguration.getInstance();
 		// Sets ensure that lists only contain unique customers
 		Set<DocumentProperties> uniqueCustomers = new HashSet<DocumentProperties>();
 		Map<DocumentProperties, Integer> multiCustomers = new HashMap<>();
@@ -34,7 +40,7 @@ public class BatchTypesCalculator {
 		Map<String, Integer> fleetMap = new HashMap<String, Integer>();
 		Set<String> uniqueFleets = new HashSet<String>();
         // Batch Type changed to clerical when over the maxMulti limit
-        int maxMulti = ProductionConfiguration.getInstance().getMaxMulti();
+        int maxMulti = prodConfig.getMaxMulti();
 		
         // Group Fleets together & determine if non-fleets are unique or multis
 		for (DocumentProperties docProp : docProps) {
@@ -106,7 +112,7 @@ public class BatchTypesCalculator {
 	 * @param lang
 	 * @return
 	 */
-	private static boolean isGroup(BatchType multi, String lang) {
+	private boolean isGroup(BatchType multi, String lang) {
 		return !isNotIgnore(multi, lang);
 	}
 
@@ -118,8 +124,8 @@ public class BatchTypesCalculator {
 	 * @param lang
 	 * @return true if site is not set as 'X' in config file
 	 */
-	private static boolean isNotIgnore(BatchType batchType, String lang) {
-		return !ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf(batchType.name() + lang)).equals("X");
+	private boolean isNotIgnore(BatchType batchType, String lang) {
+		return !prodConfig.getSite(FullBatchType.valueOf(batchType.name() + lang)).equals("X");
 	}
 	
 	/**
@@ -128,8 +134,8 @@ public class BatchTypesCalculator {
 	 * @param lang
 	 * @return true if site is not 'X' or 'XX' in config file
 	 */
-	private static boolean isAllowMulti(String lang) {
-		String site = ProductionConfiguration.getInstance().getSite(FullBatchType.valueOf("MULTI" + lang));
+	private boolean isAllowMulti(String lang) {
+		String site = prodConfig.getSite(FullBatchType.valueOf("MULTI" + lang));
 			return !(site.equals("XX") || site.equals("X"));
 	}
 }
