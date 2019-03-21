@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import uk.gov.dvla.osg.common.classes.Selector;
-import uk.gov.dvla.osg.common.config.PresentationPriorityLookup;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 import uk.gov.dvla.osg.common.config.SelectorLookup;
 
@@ -26,9 +25,8 @@ public class Main {
 
     private static ProductionConfiguration prodConfig;
 
-    private static PresentationPriorityLookup presLookup;
-
     public static void main(String[] args) {
+        
         LOGGER.trace("--- calcBatchType Started ---");
 
         try {
@@ -46,7 +44,7 @@ public class Main {
             loadLookupFiles(appConfig, docProps);
             // set batch types
             LOGGER.trace("Run Batch Type Calculator");
-            BatchTypesCalculator btc = new BatchTypesCalculator(prodConfig, presLookup);
+            BatchTypesCalculator btc = new BatchTypesCalculator(prodConfig);
             btc.run(docProps);
             LOGGER.trace("Printing Summary");
             // save to new file
@@ -118,9 +116,6 @@ public class Main {
                 + selector.getProductionConfig()
                 + appConfig.ProductionFileSuffix());
 
-        presLookup = PresentationPriorityLookup.getInstance(appConfig.getPresentationPriorityConfigPath()
-                + selector.getPresentationConfig()
-                + appConfig.getPresentationPriorityFileSuffix());
     }
 
     /**

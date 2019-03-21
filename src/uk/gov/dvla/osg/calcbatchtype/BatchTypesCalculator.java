@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uk.gov.dvla.osg.common.config.PresentationPriorityLookup;
 import uk.gov.dvla.osg.common.config.ProductionConfiguration;
 import uk.gov.dvla.osg.common.enums.BatchType;
 import uk.gov.dvla.osg.common.enums.FullBatchType;
@@ -22,12 +21,10 @@ public class BatchTypesCalculator {
 
 	private static final int MIN_CUSTOMERS_FOR_MULTI = 2; // MultiCustomer + Unique Customer
     private static final Logger LOGGER = LogManager.getLogger();
-    private final PresentationPriorityLookup presConfig;
     private final ProductionConfiguration prodConfig;
 	
-    public BatchTypesCalculator(ProductionConfiguration prodConfig, PresentationPriorityLookup presConfig) {
+    public BatchTypesCalculator(ProductionConfiguration prodConfig) {
         this.prodConfig = prodConfig;
-        this.presConfig = presConfig;
     }
     
 	public void run(ArrayList<DocumentProperties> docProps) {
@@ -100,7 +97,6 @@ public class BatchTypesCalculator {
 				// Single so set EOG
 				dp.setEog();
 			}
-			dp.setPresentationPriority(presConfig.lookupRunOrder(dp.getBatchType()));
 		});
 	}
 
